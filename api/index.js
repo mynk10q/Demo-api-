@@ -1,22 +1,29 @@
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const { number } = req.query;
 
-  // agar specific number ho tabhi data de
-  if (number === "919876543210") {
+  // ❌ agar number allowed nahi hai
+  if (number !== "919876543210") {
     return res.status(200).json({
-      success: true,
-      number: "919876543210",
-      name: "Demo User",
-      carrier: "Jio",
-      circle: "Delhi",
-      status: "Active",
-      source: "Demo API by MYNK"
+      success: false,
+      message: "Demo API"
     });
   }
 
-  // baki sab ke liye same fixed response
-  return res.status(200).json({
-    success: false,
-    message: "No data found (Demo API)"
-  });
+  try {
+    // ✅ backend API call (sirf allowed number ke liye)
+    const response = await fetch(
+      "https://leaked-api-kfo9.vercel.app/premiuskmsm/search/919876543210"
+    );
+
+    const data = await response.json();
+
+    // ✅ wahi exact data return
+    return res.status(200).json(data);
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching data"
+    });
+  }
 }
